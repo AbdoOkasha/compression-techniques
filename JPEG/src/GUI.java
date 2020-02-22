@@ -1,4 +1,3 @@
-package tree;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.EventQueue;
@@ -6,7 +5,9 @@ import java.awt.FileDialog;
 import java.awt.Frame;
 
 import javax.swing.JFrame;
+import javax.swing.JLabel;
 import javax.swing.JPanel;
+import javax.swing.JScrollPane;
 import javax.swing.border.EmptyBorder;
 import java.awt.GridBagLayout;
 
@@ -31,7 +32,7 @@ public class GUI extends JFrame {
 	private JTextField data;
 	private String value="";
 	public boolean compress_btn_state=false;
-	public tree t= new tree();
+	public HuffmanJPEG JPEG= new HuffmanJPEG();
 
 	/**
 	 * Launch the application.
@@ -56,7 +57,8 @@ public class GUI extends JFrame {
 
 		JButton de_compress_btn=new JButton("decompress");
 		JButton compress_btn = new JButton("add");
-		JTextArea outText = new JTextArea();
+		JTextArea textArea = new JTextArea();
+		JScrollPane outText = new JScrollPane(textArea);
 		
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		setBounds(100, 100, 450, 300);
@@ -179,8 +181,8 @@ public class GUI extends JFrame {
 					compress_btn.setEnabled(false);
 					try {
 						String path= browse.getText();
-						String out=t.compress(data.getText(),path);
-						outText.setText(out);
+						String out=JPEG.encode(data.getText(),path);
+						textArea.setText(out);
 					} catch (IOException e) {
 						e.printStackTrace();
 					}
@@ -216,9 +218,8 @@ public class GUI extends JFrame {
 				if(arg0.getSource()==de_compress_btn) {
 					try {
 						String path= browse.getText();
-						String out=t.deCompress(path);
-						t.WriteToFile(path, out);
-						outText.setText(out);
+						String out=JPEG.decode(path);
+						textArea.setText(out);
 					} catch (IOException e) {
 						e.printStackTrace();
 					}

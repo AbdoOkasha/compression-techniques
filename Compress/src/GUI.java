@@ -1,4 +1,3 @@
-package tree;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.EventQueue;
@@ -31,7 +30,6 @@ public class GUI extends JFrame {
 	private JTextField data;
 	private String value="";
 	public boolean compress_btn_state=false;
-	public tree t= new tree();
 
 	/**
 	 * Launch the application.
@@ -55,8 +53,8 @@ public class GUI extends JFrame {
 	public GUI() {
 
 		JButton de_compress_btn=new JButton("decompress");
-		JButton compress_btn = new JButton("add");
-		JTextArea outText = new JTextArea();
+		JButton compress_btn = new JButton("append");
+		JButton btnAdd = new JButton("rewrite");
 		
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		setBounds(100, 100, 450, 300);
@@ -104,6 +102,7 @@ public class GUI extends JFrame {
 						    		de_compress_btn.setEnabled(true);
 						    		if(data.getText().length()>=1) {
 						    			compress_btn.setEnabled(true);
+						    			btnAdd.setEnabled(true);
 						    		}
 						    		compress_btn_state=true;
 						    	}
@@ -111,12 +110,14 @@ public class GUI extends JFrame {
 						    	else {
 						    		de_compress_btn.setEnabled(false);
 						    		compress_btn.setEnabled(false);
+						    		btnAdd.setEnabled(false);
 						    		compress_btn_state=false;
 						    	}
 						    }
 						    else {
 						    	de_compress_btn.setEnabled(false);
 						    	compress_btn.setEnabled(false);
+						    	btnAdd.setEnabled(false);
 					    		compress_btn_state=false;
 						    }
 						}
@@ -148,13 +149,16 @@ public class GUI extends JFrame {
 				if(value.length()>=1) {
 					if(compress_btn_state==true) {
 						compress_btn.setEnabled(true);
+						btnAdd.setEnabled(true);
 					}
 					else {
 						compress_btn.setEnabled(false);
+						btnAdd.setEnabled(false);
 					}
 				}
 				else {
 					compress_btn.setEnabled(false);
+					btnAdd.setEnabled(false);
 				}
 				
 			}
@@ -167,7 +171,7 @@ public class GUI extends JFrame {
 		
 		GridBagConstraints gbc_compress_btn = new GridBagConstraints();
 		gbc_compress_btn.insets = new Insets(0, 0, 5, 5);
-		gbc_compress_btn.gridx = 6;
+		gbc_compress_btn.gridx = 3;
 		gbc_compress_btn.gridy = 3;
 		compress_btn.setEnabled(false);
 		panel.add(compress_btn, gbc_compress_btn);
@@ -176,11 +180,12 @@ public class GUI extends JFrame {
 			@Override
 			public void actionPerformed(ActionEvent arg0) {
 				if(arg0.getSource()==compress_btn) {
+					String input=data.getText();
+					data.setText(null);
+					btnAdd.setEnabled(false);
 					compress_btn.setEnabled(false);
 					try {
-						String path= browse.getText();
-						String out=t.compress(data.getText(),path);
-						outText.setText(out);
+						main.compress(input,browse.getText(),true);
 					} catch (IOException e) {
 						e.printStackTrace();
 					}
@@ -190,18 +195,44 @@ public class GUI extends JFrame {
 			}
 		});
 		
+		GridBagConstraints gbc_btnAdd = new GridBagConstraints();
+		gbc_btnAdd.insets = new Insets(0, 0, 5, 5);
+		gbc_btnAdd.gridx = 10;
+		gbc_btnAdd.gridy = 3;
+		btnAdd.setEnabled(false);
+		panel.add(btnAdd, gbc_btnAdd);
+		btnAdd.addActionListener(new ActionListener() {
+			
+			@Override
+			public void actionPerformed(ActionEvent arg0){
+				if(arg0.getSource()==btnAdd) {
+					String input=data.getText();
+					data.setText(null);
+					btnAdd.setEnabled(false);
+					compress_btn.setEnabled(false);
+					try {
+						main.compress(input,browse.getText(),false);
+					} catch (IOException e) {
+						e.printStackTrace();
+					}
+				
+			}
+				
+			}
+		});
 		
 		
-		outText.setFont(new Font("Courier New", Font.BOLD | Font.ITALIC, 12));
-		GridBagConstraints gbc_outText = new GridBagConstraints();
-		gbc_outText.gridheight = 6;
-		gbc_outText.gridwidth = 8;
-		gbc_outText.insets = new Insets(0, 0, 0, 5);
-		gbc_outText.fill = GridBagConstraints.BOTH;
-		gbc_outText.gridx = 1;
-		gbc_outText.gridy = 5;
-		outText.setForeground(Color.BLACK);
-		panel.add(outText, gbc_outText);
+		JTextArea deComp_text = new JTextArea();
+		deComp_text.setFont(new Font("Courier New", Font.BOLD | Font.ITALIC, 12));
+		GridBagConstraints gbc_deComp_text = new GridBagConstraints();
+		gbc_deComp_text.gridheight = 6;
+		gbc_deComp_text.gridwidth = 8;
+		gbc_deComp_text.insets = new Insets(0, 0, 0, 5);
+		gbc_deComp_text.fill = GridBagConstraints.BOTH;
+		gbc_deComp_text.gridx = 1;
+		gbc_deComp_text.gridy = 5;
+		deComp_text.setForeground(Color.BLACK);
+		panel.add(deComp_text, gbc_deComp_text);
 		
 		GridBagConstraints gbc_de_compress_btn = new GridBagConstraints();
 		gbc_de_compress_btn.insets = new Insets(0, 0, 5, 5);
@@ -215,10 +246,8 @@ public class GUI extends JFrame {
 			public void actionPerformed(ActionEvent arg0) {
 				if(arg0.getSource()==de_compress_btn) {
 					try {
-						String path= browse.getText();
-						String out=t.deCompress(path);
-						t.WriteToFile(path, out);
-						outText.setText(out);
+						String result=main.decompress(browse.getText());
+						deComp_text.setText(result);
 					} catch (IOException e) {
 						e.printStackTrace();
 					}
